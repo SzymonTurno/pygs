@@ -16,9 +16,9 @@ class __node:
         self.visible = True
 
 class __flow:
-    def __init__(self, left, right, desc, bothdir):
-        self.left = left
-        self.right = right
+    def __init__(self, leftstr, rightstr, desc, bothdir):
+        self.leftstr = leftstr
+        self.rightstr = rightstr
         self.desc = desc
         self.bothdir = bothdir
         self.reversed = False
@@ -63,19 +63,17 @@ def __print_nodes():
         print('    ' + __dcl_str(i, label + shape + style + fillcolor))
 
 def __arrow_attr(desc):
-    tmp = '[label=\"' + desc
-
-    return tmp + '\" shape=\"box\" color=\"white\" margin=0 height=0]'
+    if desc is '.':
+        return '[shape=\"point\"]'
+    return '[label=\"' + desc + '\" shape=\"box\" color=\"white\" margin=0 height=0]'
 
 def __print_flow_with_desc(name, flow):
-    leftstr = 'node' + str(flow.right if flow.reversed else flow.left)
-    rightstr = 'node' + str(flow.left if flow.reversed else flow.right)
     lefthead = '[dir=back]' if flow.reversed or flow.bothdir else '[arrowhead=none]'
     righthead = '[arrowhead=none]' if flow.reversed and not flow.bothdir else ''
 
     print('    ' + name + __arrow_attr(flow.desc))
-    print('    ' + leftstr + '->' + name + lefthead + ';')
-    print('    ' + name + '->' + rightstr + righthead + ';')
+    print('    ' + flow.leftstr + '->' + name + lefthead + ';')
+    print('    ' + name + '->' + flow.rightstr + righthead + ';')
 
 def __print_flows():
     global __flows
@@ -83,14 +81,20 @@ def __print_flows():
 
     for flow in __flows:
         if flow.desc is not '':
-            __print_flow_with_desc('lab'+str(i), flow)
-            i += 1
+            __print_flow_with_desc('flow' + str(i), flow)
         else:
-            leftstr = 'node' + str(flow.right if flow.reversed else flow.left)
-            rightstr = 'node' + str(flow.left if flow.reversed else flow.right)
             backstr = '[dir=back];' if flow.reversed else ';'
+            print('    ' + flow.leftstr + '->' + flow.rightstr + backstr)
+        i += 1
 
-            print('    ' + leftstr + '->' + rightstr + backstr)
+def __connect(left, right, bothdir):
+    global __nodes
+
+    __nodes[left].hasoutput = True
+    __nodes[right].hasinput = True
+    if bothdir:
+        __nodes[left].hasinput = True
+        __nodes[right].hasoutput = True
 
 def entity(desc):
     global __nodes
@@ -121,21 +125,28 @@ def storage(categ, desc):
 
 def flow(left, right, desc, bothdir=False):
     global __flows
-    global __nodes
-    flow = __flow(left, right, desc, bothdir)
+    flow = __flow('node' + str(left), 'node' + str(right), desc, bothdir)
 
-    __nodes[left].hasoutput = True
-    __nodes[right].hasinput = True
-    if bothdir:
-        __nodes[left].hasinput = True
-        __nodes[right].hasoutput = True
+    __connect(left, right, bothdir)
     __flows.append(flow)
+    return len(__flows) - 1
 
 def reverse_flow(left, right, desc, bothdir=False):
     global __flows
+    flow = __flow('node' + str(right), 'node' + str(left), desc, bothdir)
 
-    flow(left, right, desc, bothdir)
-    __flows[-1].reversed = True
+    flow.reversed = True
+    __connect(left, right, bothdir)
+    __flows.append(flow)
+    return len(__flows) - 1
+
+def fork(flowid, right):
+    global __flows
+    flow = __flow('flow' + str(flowid), 'node' + str(right), '', False)
+
+    if __flows[flowid].desc is '':
+        __flows[flowid].desc = '.'
+    __flows.append(flow)
 
 def rankdir_lr():
     global __dirlr
