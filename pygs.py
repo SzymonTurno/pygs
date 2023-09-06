@@ -43,13 +43,12 @@ def __get_fillcolor(node):
         return 'lightgreen'
     return 'white'
 
-def __print_nodes():
+def __print_nodes(ids):
     global __nodes
     global __dirlr
-    i = 0
 
-    for node in __nodes[1:]:
-        i += 1
+    for id in ids:
+        node = __nodes[id]
         if not node.visible:
             continue
         attrs = ''
@@ -67,7 +66,7 @@ def __print_nodes():
         attrs = label + shape + style + fillcolor
         if node.href is not '':
             attrs += ' href=\"' + node.href + '\"'
-        print('    ' + __dcl_str(i, attrs))
+        print('    ' + __dcl_str(id, attrs))
 
 def __arrow_attr(desc):
     if desc is '.':
@@ -82,17 +81,16 @@ def __print_flow_with_desc(name, flow):
     print('    ' + flow.leftstr + '->' + name + lefthead + ';')
     print('    ' + name + '->' + flow.rightstr + righthead + ';')
 
-def __print_flows():
+def __print_flows(ids):
     global __flows
-    i = 0
 
-    for flow in __flows:
+    for id in ids:
+        flow = __flows[id]
         if flow.desc is not '':
-            __print_flow_with_desc('flow' + str(i), flow)
+            __print_flow_with_desc('flow' + str(id), flow)
         else:
             backstr = '[dir=back];' if flow.reversed else ';'
             print('    ' + flow.leftstr + '->' + flow.rightstr + backstr)
-        i += 1
 
 def __connect(left, right, bothdir):
     global __nodes
@@ -161,6 +159,7 @@ def fork(flowid, right):
     if __flows[flowid].desc is '':
         __flows[flowid].desc = '.'
     __flows.append(flow)
+    return len(__flows) - 1
 
 def rankdir_lr():
     global __dirlr
@@ -185,7 +184,7 @@ def fontname(name):
 def link(nodeid, href):
     __nodes[nodeid].href = href
 
-def print_dfd(name):
+def print_part(name, nodeids, flowids):
     global __dirlr
 
     print('digraph ' + name + ' {')
@@ -195,7 +194,13 @@ def print_dfd(name):
         print('    rankdir=\"TB\";')
     print(__attrs, end='')
     print('')
-    __print_nodes()
+    __print_nodes(nodeids)
     print('')
-    __print_flows()
+    __print_flows(flowids)
     print('}')
+
+def print_full(name):
+    global __nodes
+    global __flows
+
+    print_part(name, range(1, len(__nodes)), range(len(__flows)))

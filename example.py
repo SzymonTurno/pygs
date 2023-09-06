@@ -49,5 +49,5 @@ pygs.flow(p_with, d_acnt, 'Updated account balance')
 pygs.flow(e_cust, p_with, 'Withdraw amount', True)
 
 print('@startuml dfd')
-pygs.print_dfd('gane_sarson')
+pygs.print_full('gane_sarson')
 print('@enduml')
