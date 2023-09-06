@@ -18,7 +18,7 @@ Run make to get SVG from the example:
 
 ## Example
 
-![Alt text](./docs/dfd.svg "Result")
+![Alt text](./docs/dfd.svg? "Result")
 
 ``` python
 import pygs
