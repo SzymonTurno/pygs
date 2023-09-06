@@ -7,6 +7,11 @@ pygs.fontname('Calibri')
 pygs.attribute('splines', 'ortho')
 pygs.attribute('nodesep', '1')
 
+e_comment = pygs.entity('This is an example.')
+e_gitref = pygs.entity('REPO')
+pygs.link(e_gitref, 'https://github.com/SzymonTurno/pygs')
+pygs.invisible_flow(e_comment, e_gitref)
+
 # Define entity nodes.
 e_csa = pygs.entity('Customer Service Assistant')
 e_cust = pygs.entity('Customer')

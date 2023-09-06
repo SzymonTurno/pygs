@@ -14,6 +14,7 @@ class __node:
         self.hasoutput = False
         self.nprocs = nprocs
         self.visible = True
+        self.href = ''
 
 class __flow:
     def __init__(self, leftstr, rightstr, desc, bothdir):
@@ -38,6 +39,8 @@ def __get_fillcolor(node):
         return 'lightblue'
     if node.hasinput and node.hasoutput:
         return 'lightsteelblue'
+    if node.href is not '':
+        return 'lightgreen'
     return 'white'
 
 def __print_nodes():
@@ -49,6 +52,7 @@ def __print_nodes():
         i += 1
         if not node.visible:
             continue
+        attrs = ''
         label = node.label if __dirlr else '{' + node.label + '}'
         shape = 'Mrecord' if node.component is component.PROC else 'record'
         style = 'solid'
@@ -60,7 +64,10 @@ def __print_nodes():
         label = 'label=\"' + label + '\"'
         shape = ' shape=\"' + shape + '\"'
         style = ' style=\"' + style + '\"'
-        print('    ' + __dcl_str(i, label + shape + style + fillcolor))
+        attrs = label + shape + style + fillcolor
+        if node.href is not '':
+            attrs += ' href=\"' + node.href + '\"'
+        print('    ' + __dcl_str(i, attrs))
 
 def __arrow_attr(desc):
     if desc is '.':
@@ -131,6 +138,13 @@ def flow(left, right, desc, bothdir=False):
     __flows.append(flow)
     return len(__flows) - 1
 
+def invisible_flow(left, right):
+    global __flows
+    flow = __flow('node' + str(left), 'node' + str(right) + '[style=\"invis\"]', '', False)
+
+    __flows.append(flow)
+    return len(__flows) - 1
+
 def reverse_flow(left, right, desc, bothdir=False):
     global __flows
     flow = __flow('node' + str(right), 'node' + str(left), desc, bothdir)
@@ -167,6 +181,9 @@ def fontname(name):
     global __attrs
 
     __attrs = __attrs + '    node[fontname=\"' + name + '\"];\n'
+
+def link(nodeid, href):
+    __nodes[nodeid].href = href
 
 def print_dfd(name):
     global __dirlr
