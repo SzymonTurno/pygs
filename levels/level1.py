@@ -1,5 +1,7 @@
 from level0 import *
 
+pygs.attribute('ordering', '')
+
 e_up = pygs.entity('UP')
 pygs.link(e_up, 'level0.svg')
 
