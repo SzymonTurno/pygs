@@ -16,6 +16,7 @@ class __node:
         self.visible = True
         self.href = ''
         self.info = ''
+        self.color = ''
 
 class __flow:
     def __init__(self, leftstr, rightstr, desc, bothdir):
@@ -34,6 +35,8 @@ __dirlr = False
 __attrs = ''
 
 def __get_fillcolor(node):
+    if node.color is not '':
+        return node.color
     if not node.hasinput and node.hasoutput:
         return 'lightgrey'
     if node.hasinput and not node.hasoutput:
@@ -201,6 +204,11 @@ def flow_info(flowid, info):
     global __flows
 
     __flows[flowid].info = info
+
+def node_color(nodeid, color):
+    global __nodes
+
+    __nodes[nodeid].color = color
 
 def rankdir_lr():
     global __dirlr
