@@ -33,6 +33,7 @@ f0_custdets = pygs.flow(e_cust, p_ref, 'Customer order details')
 f0_brokdets = pygs.flow(e_brok, p_ref, 'Broker order details')
 f0_details = pygs.flow(p_ref, e_stock, 'Transaction details')
 f0_history = pygs.reverse_flow(p_ref, e_cust, 'Transaction history')
+pygs.flow_info(f0_details, 'Place order\'s output')
 
 with open('level0.puml', 'w') as sys.stdout:
     print('@startuml level0')

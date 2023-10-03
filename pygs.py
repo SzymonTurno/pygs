@@ -15,6 +15,7 @@ class __node:
         self.nprocs = nprocs
         self.visible = True
         self.href = ''
+        self.info = ''
 
 class __flow:
     def __init__(self, leftstr, rightstr, desc, bothdir):
@@ -23,6 +24,7 @@ class __flow:
         self.desc = desc
         self.bothdir = bothdir
         self.reversed = False
+        self.info = ''
 
 __nodes = [__node(component.PROC, 1)]
 __flows = []
@@ -30,9 +32,6 @@ __noutputs = 0
 __ninputs = 0
 __dirlr = False
 __attrs = ''
-
-def __dcl_str(i, attrs):
-    return 'node' + str(i) + '[' + attrs + '];'
 
 def __get_fillcolor(node):
     if not node.hasinput and node.hasoutput:
@@ -68,18 +67,22 @@ def __print_nodes(ids):
         attrs = label + shape + style + fillcolor
         if node.href is not '':
             attrs += ' href=\"' + node.href + '\"'
-        print('    ' + __dcl_str(id, attrs))
+        if node.info is not '':
+            attrs += ' tooltip=\"' + node.info + '\"'
+        print('    ' + 'node' + str(id) + '[' + attrs + '];')
 
-def __arrow_attr(desc):
+def __arrow_attr(desc, info):
     if desc is '.':
         return '[shape=\"point\"]'
-    return '[label=\"' + desc + '\" shape=\"box\" color=\"white\" margin=0 height=0]'
+    if info is not '':
+        info = ' tooltip=\"' + info + '\"'
+    return '[label=\"' + desc + '\"' + info + ' shape=\"box\" color=\"white\" margin=0 height=0]'
 
 def __print_flow_with_desc(name, flow):
     lefthead = '[dir=back]' if flow.reversed or flow.bothdir else '[arrowhead=none]'
     righthead = '[arrowhead=none]' if flow.reversed and not flow.bothdir else ''
 
-    print('    ' + name + __arrow_attr(flow.desc))
+    print('    ' + name + __arrow_attr(flow.desc, flow.info))
     print('    ' + flow.leftstr + '->' + name + lefthead + ';')
     print('    ' + name + '->' + flow.rightstr + righthead + ';')
 
@@ -171,6 +174,7 @@ def input(flowid, nodeid, reversed=False):
     flow = __flow(left, right, __flows[flowid].desc, False)
 
     flow.reversed = reversed
+    flow.info = __flows[flowid].info
     __ninputs = __ninputs + 1
     __flows.append(flow)
     return len(__flows) - 1
@@ -183,9 +187,20 @@ def output(nodeid, flowid, reversed=False):
     flow = __flow(left, right, __flows[flowid].desc, False)
 
     flow.reversed = reversed
+    flow.info = __flows[flowid].info
     __noutputs = __noutputs + 1
     __flows.append(flow)
     return len(__flows) - 1
+
+def node_info(nodeid, info):
+    global __nodes
+
+    __nodes[nodeid].info = info
+
+def flow_info(flowid, info):
+    global __flows
+
+    __flows[flowid].info = info
 
 def rankdir_lr():
     global __dirlr

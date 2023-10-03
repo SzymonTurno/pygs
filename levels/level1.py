@@ -4,6 +4,7 @@ pygs.attribute('ordering', '')
 
 e_up = pygs.entity('UP')
 pygs.link(e_up, 'level0.svg')
+pygs.node_info(e_up, 'Go to level 0')
 
 p_place = pygs.process(p_ref, 'Place Order')
 p_check = pygs.process(p_ref, 'Check Transaction')
