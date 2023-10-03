@@ -29,9 +29,10 @@ pygs.flow(e_cust, p_dep, 'Deposit amount')
 pygs.flow(p_dep, d_acnt, 'Updated account balance')
 pygs.flow(p_with, d_acnt, 'Updated account balance')
 pygs.flow(e_cust, p_with, 'Withdraw amount', True)
-pygs.flow(e_cust, p_ref, '', True)
-pygs.flow(e_brok, p_ref, '')
-pygs.flow(p_ref, e_stock, '')
+f0_custdets = pygs.flow(e_cust, p_ref, 'Customer order details')
+f0_brokdets = pygs.flow(e_brok, p_ref, 'Broker order details')
+f0_details = pygs.flow(p_ref, e_stock, 'Transaction details')
+f0_history = pygs.reverse_flow(p_ref, e_cust, 'Transaction history')
 
 with open('level0.puml', 'w') as sys.stdout:
     print('@startuml level0')

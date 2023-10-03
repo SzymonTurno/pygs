@@ -26,6 +26,8 @@ class __flow:
 
 __nodes = [__node(component.PROC, 1)]
 __flows = []
+__noutputs = 0
+__ninputs = 0
 __dirlr = False
 __attrs = ''
 
@@ -161,6 +163,30 @@ def fork(flowid, right):
     __flows.append(flow)
     return len(__flows) - 1
 
+def input(flowid, nodeid, reversed=False):
+    global __flows
+    global __ninputs
+    left = 'node' + str(nodeid) if reversed else 'input' + str(__ninputs)
+    right = 'input' + str(__ninputs) if reversed else 'node' + str(nodeid)
+    flow = __flow(left, right, __flows[flowid].desc, False)
+
+    flow.reversed = reversed
+    __ninputs = __ninputs + 1
+    __flows.append(flow)
+    return len(__flows) - 1
+
+def output(nodeid, flowid, reversed=False):
+    global __flows
+    global __noutputs
+    left = 'output' + str(__noutputs) if reversed else 'node' + str(nodeid)
+    right = 'node' + str(nodeid) if reversed else 'output' + str(__noutputs)
+    flow = __flow(left, right, __flows[flowid].desc, False)
+
+    flow.reversed = reversed
+    __noutputs = __noutputs + 1
+    __flows.append(flow)
+    return len(__flows) - 1
+
 def rankdir_lr():
     global __dirlr
 
@@ -193,6 +219,11 @@ def print_part(name, nodeids, flowids):
     else:
         print('    rankdir=\"TB\";')
     print(__attrs, end='')
+    print('')
+    for i in range(__noutputs):
+        print('    output' + str(i) + '[style=invis];')
+    for i in range(__ninputs):
+        print('    input' + str(i) + '[style=invis];')
     print('')
     __print_nodes(nodeids)
     print('')
